@@ -51,21 +51,83 @@ const previous = document.getElementById("previous-button");
 const next     = document.getElementById("next-button");
 
 
+let qIndex = 0;
 function loadQuiz(questions){
-   let qIndex = 0;
+//    indicate the question count
+  questionCount.innerHTML =`Question ${qIndex + 1} of ${ questions.length}`;
+  // determine the width of the progressbar
+  let progressWidth = ((qIndex + 1)/questions.length) * 100;
+  progressBar.style.width = `${progressWidth}%`;
    showQuestionContent(questions,qIndex);
-
 }
-loadQuiz();
 
-function showQuestionContent(q,index){
+
+//    Next Button
+next.addEventListener("click",function(evt){
+    previous.removeAttribute("disabled");
+    if(qIndex === questions.length - 1){
+        next.setAttribute("disabled",true);
+    }else{
+
+        qIndex++;
+        loadQuiz(questions);
+    }
+});
+
+//    previous Button
+previous.addEventListener("click",function(evt){
+    if(qIndex === 0){
+        previous.setAttribute("disabled",true);
+    }else if(qIndex > 0  && qIndex < questions.length){
+          qIndex--;
+        previous.removeAttribute("disabled");
+        next.removeAttribute("disabled");
+    }
+
+  loadQuiz(questions);
+});
+
+
+// initil loading of the questions
+loadQuiz(questions);
+
+function showQuestionContent(qst,index){
     let content = `<p class="question-number">Question ${index +1}</p>
-                   <h2 class="question" id="question-text">${q[index].q}}</h2>
+                   <h2 class="question" id="question-text">${qst[index].q}</h2>
                     <div class="options" id="options" role="group" aria-label="Answer choices">
-                       ${ q[index].options.forEach((o,i )=> {
-                           return  `<button class="option" type="button" data-option="${i}">${o}</button>`
-                       })}
+                       ${ listOptions(qst[index].options )}
                     </div>
                 `;
     quizContent.innerHTML = content;
+}
+
+function listOptions(options){
+    let optionsButtons = "";
+    options.forEach((o,i )=>{
+        optionsButtons+=`<button class="option" type="button" data-option="${i}">${o}</button>`;
+    });
+    return optionsButtons;
+}
+
+
+let questionOptionButons = document.querySelectorAll("div.options .option");
+questionOptionButons.forEach( (ob,i) =>{
+    ob.addEventListener('click', function(evt){
+       let dataOption = evt.target.getAttribute("data-option");
+       // assign i selected
+       evt.target.classList.toggle("selected");
+       console.log(dataOption);
+    })
+})
+
+console.log(questionOptionButons);
+
+function scoreCalc(q,qIndex,oIndex){
+  let score = 0; 
+  let qScore = ( 1/questions.length ) * 100;
+
+  if(q[qIndex].correct === oIndex){
+    score+=qScore;
+  }
+  quizScore.innerHTML = score;
 }
