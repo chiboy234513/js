@@ -59,6 +59,23 @@ function loadQuiz(questions){
   let progressWidth = ((qIndex + 1)/questions.length) * 100;
   progressBar.style.width = `${progressWidth}%`;
    showQuestionContent(questions,qIndex);
+
+
+       const questionOptionButons = document.querySelectorAll("div.options .option");
+    questionOptionButons.forEach( (ob) =>{
+        ob.addEventListener('click', function(evt){
+        let dataOption = evt.target.getAttribute("data-option");
+        // deselet all other options
+        questionOptionButons.forEach((o)=>{
+            o.classList.remove("selected");
+        })
+        // assign i selected
+        evt.target.classList.toggle("selected");
+        scoreCalc(questions,qIndex,parseInt(dataOption) );
+        console.log(dataOption, typeof dataOption);
+        })
+    })
+    console.log(questionOptionButons);
 }
 
 
@@ -82,9 +99,9 @@ previous.addEventListener("click",function(evt){
           qIndex--;
         previous.removeAttribute("disabled");
         next.removeAttribute("disabled");
+        loadQuiz(questions);
     }
 
-  loadQuiz(questions);
 });
 
 
@@ -110,24 +127,12 @@ function listOptions(options){
 }
 
 
-let questionOptionButons = document.querySelectorAll("div.options .option");
-questionOptionButons.forEach( (ob,i) =>{
-    ob.addEventListener('click', function(evt){
-       let dataOption = evt.target.getAttribute("data-option");
-       // assign i selected
-       evt.target.classList.toggle("selected");
-       console.log(dataOption);
-    })
-})
 
-console.log(questionOptionButons);
-
+let score = 0; 
 function scoreCalc(q,qIndex,oIndex){
-  let score = 0; 
-  let qScore = ( 1/questions.length ) * 100;
-
-  if(q[qIndex].correct === oIndex){
-    score+=qScore;
-  }
+  let qScore = ( 1/q.length ) * 100; 
+    if(q[qIndex].correct === oIndex){
+        score+=qScore;
+    } 
   quizScore.innerHTML = score;
 }
